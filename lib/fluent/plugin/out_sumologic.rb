@@ -10,6 +10,10 @@ class Fluent::SumologicOutput< Fluent::BufferedOutput
   config_param :verify_ssl, :bool, :default => true
   config_param :path, :string,  :default => '/receiver/v1/http/XXX'
   config_param :format, :string, :default => 'json'
+  config_param :proxy_host, :string,  :default => nil
+  config_param :proxy_port, :integer, :default => nil
+  config_param :proxy_user, :string,  :default => nil
+  config_param :proxy_pass, :string, :default => nil
 
   include Fluent::SetTagKeyMixin
   config_set_default :include_tag_key, false
@@ -57,7 +61,7 @@ class Fluent::SumologicOutput< Fluent::BufferedOutput
         end
     end
 
-    http = Net::HTTP.new(@host, @port.to_i)
+    http = Net::HTTP::Proxy(@proxy_host, @proxy_port, @proxy_user, @proxy_pass).new(@host, @port)
     http.use_ssl = true
     http.verify_mode = @verify_ssl ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE
     http.set_debug_output $stderr
